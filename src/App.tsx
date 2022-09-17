@@ -1,6 +1,6 @@
-import CommentList from './features/counter/comments/CommentList';
-import Form from './features/counter/comments/Form';
-import PageList from './features/counter/comments/PageList';
+import CommentList from './features/comments/CommentList';
+import Form from './features/comments/Form';
+import PageList from './features/comments/PageList';
 
 function App() {
   return (
