@@ -1,15 +1,17 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export interface CommentState {
-  id: number;
+  [key: string]: number | string | undefined;
+  id?: number;
   profile_url: string;
   author: string;
   content: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface QueryType {
-  _page: string;
+  [key: string]: string | undefined;
+  _page?: string;
   _limit?: string;
   _order?: 'desc' | 'asc';
   _sort?: string;
