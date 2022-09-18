@@ -1,22 +1,32 @@
-import { Link } from 'react-router-dom';
+import { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
+import { FormStateType } from '../../App';
+import { FIRST_PAGE } from '../../constants';
+import { CommentState, useDeleteCommentByIdMutation } from '../api/apiSlice';
 
-// 임시 데이터 입니다. 코드 작성시 data 부분을 지워주세요
-const data = [
-  {
-    id: 1,
-    profile_url: 'https://picsum.photos/id/1/50/50',
-    author: 'abc_1',
-    content: 'UI 테스트는 어떻게 진행하나요',
-    createdAt: '2020-05-01',
-  },
-];
+interface CommentProps {
+  comments?: CommentState[];
+  setPage: Dispatch<SetStateAction<number>>;
+  setFormState: Dispatch<SetStateAction<FormStateType>>;
+}
 
-export default function CommentList() {
+export default function CommentList({ comments, setPage, setFormState }: CommentProps) {
+  const [deleteCommentById] = useDeleteCommentByIdMutation();
+
+  const handleCommentUpdate = (comment: CommentState) => {
+    setFormState(() => ({ ...comment }));
+  };
+
+  const handleCommentDelete = (id: unknown) => {
+    if (window.confirm('댓글을 삭제하시겠습니까?')) {
+      deleteCommentById(id as Pick<CommentState, 'id'>);
+      setPage(FIRST_PAGE);
+    }
+  };
   return (
     <>
-      {data.map((comment, key) => (
-        <Comment key={key}>
+      {comments?.map((comment: CommentState) => (
+        <Comment key={comment.id}>
           <img src={comment.profile_url} alt="" />
 
           {comment.author}
@@ -25,10 +35,10 @@ export default function CommentList() {
 
           <Content>{comment.content}</Content>
 
-          <Button>
-            <Link to={'#'}>수정</Link>
-            <Link to={'#'}>삭제</Link>
-          </Button>
+          <ButtonsWrapper>
+            <button onClick={() => handleCommentUpdate(comment)}>수정</button>
+            <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
+          </ButtonsWrapper>
 
           <hr />
         </Comment>
@@ -58,7 +68,7 @@ const Content = styled.div`
   margin: 10px 0;
 `;
 
-const Button = styled.div`
+const ButtonsWrapper = styled.div`
   text-align: right;
   margin: 10px 0;
   & > a {

@@ -1,17 +1,42 @@
+import { Dispatch, SetStateAction } from 'react';
 import styled from 'styled-components';
+import { FIRST_PAGE, FORM_INPUTS, INITITIAL_FORM_STATE } from '../../constants';
+import FormInput from './FormInput';
+import { FormStateType } from '../../App';
+import { useAddNewCommentMutation, useUpdateCommentByIdMutation } from '../api/apiSlice';
 
-function Form() {
+interface FormProps {
+  formState: FormStateType;
+  setFormState: Dispatch<SetStateAction<FormStateType>>;
+  setPage: Dispatch<SetStateAction<number>>;
+}
+
+export default function Form({ formState, setFormState, setPage }: FormProps) {
+  const [addNewComment] = useAddNewCommentMutation();
+  const [updateComentById] = useUpdateCommentByIdMutation();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { id, ...newComment } = formState;
+    if (id) {
+      updateComentById({ id, ...newComment });
+    } else {
+      addNewComment(newComment);
+    }
+    setFormState(INITITIAL_FORM_STATE);
+    setPage(FIRST_PAGE);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormState({ ...formState, [e.target.name]: e.target.value });
+  };
+
   return (
     <FormStyle>
-      <form>
-        <input type="text" name="profile_url" placeholder="https://picsum.photos/id/1/50/50" required />
-        <br />
-        <input type="text" name="author" placeholder="작성자" />
-        <br />
-        <textarea name="content" placeholder="내용" required></textarea>
-        <br />
-        <input type="text" name="createdAt" placeholder="2022-09-17" required />
-        <br />
+      <form onSubmit={handleSubmit}>
+        {FORM_INPUTS.map((input) => (
+          <FormInput key={input._id} {...input} value={formState[input.name]} onChange={handleChange} />
+        ))}
         <button type="submit">등록</button>
       </form>
     </FormStyle>
@@ -40,5 +65,3 @@ const FormStyle = styled.div`
     cursor: pointer;
   }
 `;
-
-export default Form;
