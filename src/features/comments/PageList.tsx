@@ -1,19 +1,37 @@
-import styled from 'styled-components';
+import { Dispatch, SetStateAction } from 'react';
+import styled, { css } from 'styled-components';
 
-function PageList() {
-  const pageArray = [];
+interface PageListProps {
+  totalPage: number;
+  page: number;
+  setPage: Dispatch<SetStateAction<number>>;
+}
 
-  pageArray.push(
-    // 임시로 페이지 하나만 설정했습니다.
-    <Page key="1">1</Page>
+export default function PageList({ totalPage, page, setPage }: PageListProps) {
+  const pageArray = [...Array(totalPage)].map((_, i) => i + 1);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>, page: number) => {
+    setPage(page);
+  };
+  return (
+    <PageListStyle>
+      {pageArray.map((pageIdx) => (
+        <Page key={pageIdx} onClick={(e) => handleClick(e, pageIdx)} active={pageIdx === page}>
+          {pageIdx}
+        </Page>
+      ))}
+    </PageListStyle>
   );
-
-  return <PageListStyle>{pageArray}</PageListStyle>;
 }
 
 const PageListStyle = styled.div`
   margin-bottom: 20px;
   text-align: center;
+`;
+
+const ActivePage = css`
+  background: gray;
+  color: #fff;
 `;
 
 const Page = styled.button<{ active?: boolean }>`
@@ -22,13 +40,6 @@ const Page = styled.button<{ active?: boolean }>`
   font-size: 1rem;
   line-height: 1.5;
   border: 1px solid lightgray;
-  ${({ active }) =>
-    active &&
-    `
-        background: gray;
-        color: #fff;
-  `}
+  ${({ active }) => active && ActivePage}
   margin-right: 3px;
 `;
-
-export default PageList;
